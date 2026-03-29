@@ -13,10 +13,7 @@
       "extends": "base",
       "developmentClient": true,
       "distribution": "internal",
-      "channel": "development",
-      "ios": {
-        "simulator": true
-      }
+      "channel": "development"
     },
     "preview": {
       "extends": "base",
@@ -40,11 +37,6 @@
       "android": {
         "serviceAccountKeyPath": "./google-service-account.json",
         "track": "internal"
-      },
-      "ios": {
-        "appleId": "",
-        "ascAppId": "",
-        "appleTeamId": ""
       }
     }
   }
