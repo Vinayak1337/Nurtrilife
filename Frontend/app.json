@@ -81,10 +81,7 @@
           "enableBackgroundRemoteNotifications": false
         }
       ],
-      [
-        "expo-haptics",
-        {}
-      ]
+      "expo-auth-session"
     ],
     "experiments": {
       "typedRoutes": true
