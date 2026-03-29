@@ -255,7 +255,7 @@ function Slide({ slide }: { slide: typeof SLIDES[number] }) {
         <View style={[styles.pill, { backgroundColor: accent + '20', borderColor: accent + '40' }]}>
           <View style={[styles.pillDot, { backgroundColor: accent }]} />
           <AppText variant="label" color={accent} style={{ letterSpacing: 1.5 }}>
-            NUTRILENS
+            NUTRILIFE
           </AppText>
         </View>
         <AppText variant="title" color="#FFFFFF" align="center" style={styles.title}>

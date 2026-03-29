@@ -1,16 +1,16 @@
 {
   "expo": {
     "name": "NutriLife",
-    "slug": "NutriLens",
+    "slug": "NutriLife",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "nutrilens",
+    "scheme": "nutrilife",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.nutrilens.app",
+      "bundleIdentifier": "com.nutrilife.app",
       "infoPlist": {
         "NSCameraUsageDescription": "NutriLife uses your camera to photograph food for AI-powered nutrition analysis.",
         "NSPhotoLibraryUsageDescription": "NutriLife accesses your photos to analyze food items and track your nutrition.",
@@ -21,7 +21,7 @@
       }
     },
     "android": {
-      "package": "com.nutrilens.app",
+      "package": "com.nutrilife.app",
       "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/android-icon-foreground.png",
