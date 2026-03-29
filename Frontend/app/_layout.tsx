@@ -64,6 +64,15 @@ export default function RootLayout() {
     }
   }, [fontsLoaded, fontError]);
 
+  // Ping the backend on startup to wake Render's free tier instance
+  // before the user needs it (cold start takes ~50s otherwise)
+  useEffect(() => {
+    const base = process.env.EXPO_PUBLIC_API_BASE_URL;
+    if (base) {
+      fetch(`${base}/health`).catch(() => {});
+    }
+  }, []);
+
   if (!fontsLoaded && !fontError) {
     return null;
   }

@@ -30,7 +30,7 @@ function generateId(): string {
   return `meal_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
 }
 
-const ANALYSIS_TIMEOUT_MS = 45_000;
+const ANALYSIS_TIMEOUT_MS = 90_000; // 90s — accounts for Render free tier cold start (~50s)
 
 async function ensureMealsDir(): Promise<void> {
   const dir = `${FileSystem.documentDirectory}meals/`;
