@@ -21,6 +21,7 @@ import { CALORIE_PRESETS, MACRO_PRESETS } from '@/constants/nutrition';
 import { useAppDispatch } from '@/store/hooks';
 import { completeOnboarding, createDefaultUser } from '@/store/slices/auth.slice';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { syncUserToServer } from '@/services/sync.service';
 import { router } from 'expo-router';
 
 type MacroPresetKey = keyof typeof MACRO_PRESETS;
@@ -44,6 +45,7 @@ export default function SetupScreen() {
   const theme = Colors[colorScheme];
 
   const [step, setStep] = useState(0);
+  const [saving, setSaving] = useState(false);
   const [name, setName] = useState('');
   const [nameError, setNameError] = useState('');
   const [calorieGoal, setCalorieGoal] = useState<number>(2000);
@@ -89,19 +91,41 @@ export default function SetupScreen() {
     );
   }
 
-  function handleComplete() {
-    const preset = MACRO_PRESETS[selectedPreset];
-    const user = createDefaultUser(
-      name.trim(),
-      calorieGoal,
-      preset.protein,
-      preset.carbs,
-      preset.fats,
-      waterGoal,
-    );
-    user.healthFocus = healthFocus;
-    dispatch(completeOnboarding(user));
-    router.replace('/(app)/(tabs)/home');
+  async function handleComplete() {
+    setSaving(true);
+    try {
+      const preset = MACRO_PRESETS[selectedPreset];
+      const user = createDefaultUser(
+        name.trim(),
+        calorieGoal,
+        preset.protein,
+        preset.carbs,
+        preset.fats,
+        waterGoal,
+      );
+      user.healthFocus = healthFocus;
+
+      // Save to server first, then update Redux and navigate
+      await syncUserToServer(user);
+      dispatch(completeOnboarding(user));
+      router.replace('/(app)/(tabs)/home');
+    } catch {
+      // Server sync failed — still save locally and continue
+      const preset = MACRO_PRESETS[selectedPreset];
+      const user = createDefaultUser(
+        name.trim(),
+        calorieGoal,
+        preset.protein,
+        preset.carbs,
+        preset.fats,
+        waterGoal,
+      );
+      user.healthFocus = healthFocus;
+      dispatch(completeOnboarding(user));
+      router.replace('/(app)/(tabs)/home');
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
@@ -385,8 +409,10 @@ export default function SetupScreen() {
               size="lg"
               onPress={handleNext}
               style={styles.nextButton}
+              loading={saving}
+              disabled={saving}
             >
-              {step === STEP_LABELS.length - 1 ? '✓ Complete Setup' : 'Continue'}
+              {saving ? 'Saving...' : step === STEP_LABELS.length - 1 ? '✓ Complete Setup' : 'Continue'}
             </Button>
           </Animated.View>
         </KeyboardAvoidingView>

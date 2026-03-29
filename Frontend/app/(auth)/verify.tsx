@@ -18,7 +18,16 @@ import { Button } from '@/components/ui/button';
 import { Spacing, Palette, Radius, FontFamily, FontSize, Colors } from '@/constants/theme';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { setClerkUser } from '@/store/slices/auth.slice';
+import { setClerkUser, restoreUser } from '@/store/slices/auth.slice';
+import { setMeals } from '@/store/slices/meals.slice';
+import { setEntries } from '@/store/slices/water.slice';
+import { setBadges } from '@/store/slices/gamification.slice';
+import {
+  fetchUserFromServer,
+  fetchMealsFromServer,
+  fetchWaterFromServer,
+  fetchBadgesFromServer,
+} from '@/services/sync.service';
 
 const CODE_LENGTH = 6;
 
@@ -34,22 +43,53 @@ export default function VerifyScreen() {
 
   const [code, setCode] = useState<string[]>(Array(CODE_LENGTH).fill(''));
   const [loading, setLoading] = useState(false);
+  const [syncing, setSyncing] = useState(false);
   const [error, setError] = useState('');
   const [pendingNavigation, setPendingNavigation] = useState(false);
 
-  // Navigate reactively once Clerk confirms isSignedIn — avoids race with setActive re-renders
+  // After Clerk confirms isSignedIn, sync data from server then navigate
   useEffect(() => {
-    if (isSignedIn && pendingNavigation) {
-      if (flow === 'sign-up') {
-        // New user — always go to setup to create their profile
-        router.replace('/(auth)/setup');
-      } else {
-        // Existing user — let index.tsx check the server and route correctly.
-        // This handles fresh install, new device, or cleared app data where
-        // isOnboarded may be false in Redux but the profile exists on server.
-        router.replace('/');
+    if (!isSignedIn || !pendingNavigation) return;
+
+    if (flow === 'sign-up') {
+      // New user — go to setup to create their profile
+      router.replace('/(auth)/setup');
+      return;
+    }
+
+    // Sign-in: fetch all user data from server before going to home
+    async function syncAndNavigate() {
+      setSyncing(true);
+      try {
+        const today = new Date().toLocaleDateString('en-CA');
+
+        const serverUser = await fetchUserFromServer();
+        if (serverUser) {
+          dispatch(restoreUser(serverUser));
+
+          const [serverMeals, serverWater, serverBadges] = await Promise.all([
+            fetchMealsFromServer(today),
+            fetchWaterFromServer(today),
+            fetchBadgesFromServer(),
+          ]);
+          if (serverMeals.length > 0) dispatch(setMeals(serverMeals));
+          if (serverWater.length > 0) dispatch(setEntries(serverWater));
+          if (serverBadges.length > 0) dispatch(setBadges(serverBadges));
+
+          router.replace('/(app)/(tabs)/home');
+        } else {
+          // No profile on server — new device or first time, go to setup
+          router.replace('/(auth)/setup');
+        }
+      } catch {
+        // Network error — fall back to whatever is in Redux
+        router.replace(isOnboarded ? '/(app)/(tabs)/home' : '/(auth)/setup');
+      } finally {
+        setSyncing(false);
       }
     }
+
+    syncAndNavigate();
   }, [isSignedIn, pendingNavigation]);
   const inputs = useRef<(TextInput | null)[]>([]);
 
@@ -179,11 +219,11 @@ export default function VerifyScreen() {
               variant="primary"
               size="lg"
               fullWidth
-              loading={loading || !clerkLoaded}
+              loading={loading || syncing || !clerkLoaded}
               onPress={handleVerify}
-              disabled={!isComplete || !clerkLoaded}
+              disabled={!isComplete || !clerkLoaded || syncing}
             >
-              Verify & Continue
+              {syncing ? 'Loading your data...' : 'Verify & Continue'}
             </Button>
           </Animated.View>
         </KeyboardAvoidingView>
