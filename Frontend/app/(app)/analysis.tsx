@@ -138,14 +138,6 @@ export default function AnalysisScreen() {
   const saveError = useAppSelector((s: import('@/store').RootState) => s.meals.error);
   const prevSavingRef = useRef(false);
 
-  // Show alert if the save saga failed, then clear the error
-  useEffect(() => {
-    if (prevSavingRef.current && !isSaving && saveError) {
-      Alert.alert('Save Failed', saveError, [{ text: 'OK', onPress: () => dispatch(clearError()) }]);
-    }
-    prevSavingRef.current = isSaving;
-  }, [isSaving, saveError]);
-
   const [selectedMealType, setSelectedMealType] = useState<MealType>(() => {
     const h = new Date().getHours();
     if (h < 11) return 'breakfast';
@@ -154,11 +146,27 @@ export default function AnalysisScreen() {
     return 'snack';
   });
 
+  // Show alert if the save saga failed, then clear the error
+  useEffect(() => {
+    if (prevSavingRef.current && !isSaving && saveError) {
+      Alert.alert('Save Failed', saveError, [{ text: 'OK', onPress: () => dispatch(clearError()) }]);
+    }
+    prevSavingRef.current = isSaving;
+  }, [isSaving, saveError]);
+
   useEffect(() => {
     if (analysisResult?.mealType) {
       setSelectedMealType(analysisResult.mealType);
     }
   }, [analysisResult?.mealType]);
+
+  // No state at all — shouldn't happen in normal flow, redirect away.
+  // Must be in useEffect — calling router during render crashes React.
+  useEffect(() => {
+    if (!analysisResult && !error && !isAnalyzing) {
+      router.replace('/(app)/(tabs)/home');
+    }
+  }, [analysisResult, error, isAnalyzing]);
 
   function handleRetake() {
     dispatch(clearAnalysis());
@@ -278,14 +286,6 @@ export default function AnalysisScreen() {
       </View>
     );
   }
-
-  // No state at all — shouldn't happen in normal flow, redirect away.
-  // Must be in useEffect — calling router during render crashes React.
-  useEffect(() => {
-    if (!analysisResult && !error && !isAnalyzing) {
-      router.replace('/(app)/(tabs)/home');
-    }
-  }, [analysisResult, error, isAnalyzing]);
 
   if (!analysisResult && !error && !isAnalyzing) return null;
 
