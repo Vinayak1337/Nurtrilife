@@ -6,7 +6,9 @@
   "build": {
     "base": {
       "env": {
-        "NPM_CONFIG_LEGACY_PEER_DEPS": "true"
+        "NPM_CONFIG_LEGACY_PEER_DEPS": "true",
+        "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY": "pk_test_d2FudGVkLXBhcnJvdC0zMi5jbGVyay5hY2NvdW50cy5kZXYk",
+        "EXPO_PUBLIC_API_BASE_URL": "https://nutrilife-atra.onrender.com"
       }
     },
     "development": {
