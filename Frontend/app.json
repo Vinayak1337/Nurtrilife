@@ -20,7 +20,11 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png",
         "backgroundColor": "#10B981"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "plugins": [
       "expo-router",
@@ -66,14 +70,10 @@
     },
     "extra": {
       "eas": {
-        "projectId": "0b929960-bea5-482a-8f04-57c3e2d3e0c7"
-      }
+        "projectId": "92a97073-83a4-455a-836f-4b8e0fc88f48"
+      },
+      "router": {}
     },
-    "runtimeVersion": {
-      "policy": "appVersion"
-    },
-    "updates": {
-      "url": "https://u.expo.dev/0b929960-bea5-482a-8f04-57c3e2d3e0c7"
-    }
+    "owner": "vinayak1337"
   }
 }
