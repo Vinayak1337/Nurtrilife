@@ -10,10 +10,19 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.nutrilens.app"
+      "bundleIdentifier": "com.nutrilens.app",
+      "infoPlist": {
+        "NSCameraUsageDescription": "NutriLife uses your camera to photograph food for AI-powered nutrition analysis.",
+        "NSPhotoLibraryUsageDescription": "NutriLife accesses your photos to analyze food items and track your nutrition.",
+        "NSPhotoLibraryAddUsageDescription": "NutriLife saves food photos to your library for your records."
+      },
+      "config": {
+        "usesNonExemptEncryption": false
+      }
     },
     "android": {
       "package": "com.nutrilens.app",
+      "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
@@ -23,14 +32,18 @@
       "edgeToEdgeEnabled": true,
       "permissions": [
         "android.permission.CAMERA",
-        "android.permission.RECORD_AUDIO"
+        "android.permission.RECORD_AUDIO",
+        "android.permission.READ_MEDIA_IMAGES",
+        "android.permission.VIBRATE",
+        "android.permission.RECEIVE_BOOT_COMPLETED",
+        "android.permission.SCHEDULE_EXACT_ALARM",
+        "android.permission.POST_NOTIFICATIONS"
       ]
     },
     "plugins": [
       "expo-router",
       "expo-font",
       "expo-secure-store",
-      "expo-sqlite",
       "expo-web-browser",
       [
         "expo-splash-screen",
@@ -47,13 +60,16 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "NutriLife uses your camera to photograph food for AI-powered nutrition analysis."
+          "cameraPermission": "NutriLife uses your camera to photograph food for AI-powered nutrition analysis.",
+          "microphonePermission": "NutriLife needs microphone access for video recording.",
+          "recordAudioAndroid": false
         }
       ],
       [
         "expo-image-picker",
         {
-          "photosPermission": "NutriLife accesses your photos to analyze food items and track your nutrition."
+          "photosPermission": "NutriLife accesses your photos to analyze food items and track your nutrition.",
+          "cameraPermission": "NutriLife uses your camera to photograph food for AI-powered nutrition analysis."
         }
       ],
       [
@@ -61,8 +77,13 @@
         {
           "icon": "./assets/images/notification-icon.png",
           "color": "#10B981",
-          "sounds": []
+          "sounds": [],
+          "enableBackgroundRemoteNotifications": false
         }
+      ],
+      [
+        "expo-haptics",
+        {}
       ]
     ],
     "experiments": {

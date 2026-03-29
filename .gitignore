@@ -9,3 +9,6 @@ Frontend/android/
 Backend/node_modules/
 Backend/dist/
 Backend/.env
+
+# Secrets
+Frontend/google-service-account.json
