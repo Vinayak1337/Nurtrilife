@@ -80,8 +80,7 @@
           "sounds": [],
           "enableBackgroundRemoteNotifications": false
         }
-      ],
-      "expo-auth-session"
+      ]
     ],
     "experiments": {
       "typedRoutes": true
