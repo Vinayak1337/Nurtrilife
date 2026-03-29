@@ -4,12 +4,19 @@ import { Redirect } from 'expo-router';
 import { useAuth } from '@clerk/clerk-expo';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { restoreUser } from '@/store/slices/auth.slice';
+import { setMeals } from '@/store/slices/meals.slice';
+import { setEntries } from '@/store/slices/water.slice';
+import { setBadges } from '@/store/slices/gamification.slice';
+import {
+  fetchUserFromServer,
+  fetchMealsFromServer,
+  fetchWaterFromServer,
+  fetchBadgesFromServer,
+} from '@/services/sync.service';
 import type { RootState } from '@/store';
 
-const API_BASE = process.env.EXPO_PUBLIC_API_BASE_URL ?? '';
-
 export default function Index() {
-  const { isSignedIn, isLoaded, getToken } = useAuth();
+  const { isSignedIn, isLoaded } = useAuth();
   const dispatch = useAppDispatch();
   const isOnboarded = useAppSelector((s: RootState) => s.auth.isOnboarded);
 
@@ -26,17 +33,24 @@ export default function Index() {
     async function syncFromBackend() {
       setChecking(true);
       try {
-        // Get the JWT directly from Clerk — don't wait for TokenSetup's effect.
-        const token = await getToken();
-        const headers: Record<string, string> = {
-          'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        };
+        const today = new Date().toLocaleDateString('en-CA');
 
-        const res = await fetch(`${API_BASE}/api/user`, { headers });
-        const data = await res.json().catch(() => null);
-        if (data?.success && data?.data) {
-          dispatch(restoreUser(data.data));
+        // 1. Restore user profile — if found, mark as onboarded
+        const serverUser = await fetchUserFromServer();
+        if (serverUser) {
+          dispatch(restoreUser(serverUser));
+
+          // 2. Restore today's meals
+          const serverMeals = await fetchMealsFromServer(today);
+          if (serverMeals.length > 0) dispatch(setMeals(serverMeals));
+
+          // 3. Restore today's water entries
+          const serverWater = await fetchWaterFromServer(today);
+          if (serverWater.length > 0) dispatch(setEntries(serverWater));
+
+          // 4. Restore badges
+          const serverBadges = await fetchBadgesFromServer();
+          if (serverBadges.length > 0) dispatch(setBadges(serverBadges));
         }
       } catch {
         // Network unavailable — let routing fall through to setup.

@@ -18,16 +18,7 @@ import { Button } from '@/components/ui/button';
 import { Spacing, Palette, Radius, FontFamily, FontSize, Colors } from '@/constants/theme';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { setClerkUser, restoreUser } from '@/store/slices/auth.slice';
-import { setMeals } from '@/store/slices/meals.slice';
-import { setEntries } from '@/store/slices/water.slice';
-import { setBadges } from '@/store/slices/gamification.slice';
-import {
-  fetchUserFromServer,
-  fetchMealsFromServer,
-  fetchWaterFromServer,
-  fetchBadgesFromServer,
-} from '@/services/sync.service';
+import { setClerkUser } from '@/store/slices/auth.slice';
 
 const CODE_LENGTH = 6;
 
@@ -49,10 +40,14 @@ export default function VerifyScreen() {
   // Navigate reactively once Clerk confirms isSignedIn — avoids race with setActive re-renders
   useEffect(() => {
     if (isSignedIn && pendingNavigation) {
-      if (flow === 'sign-up' || !isOnboarded) {
+      if (flow === 'sign-up') {
+        // New user — always go to setup to create their profile
         router.replace('/(auth)/setup');
       } else {
-        router.replace('/(app)/(tabs)/home');
+        // Existing user — let index.tsx check the server and route correctly.
+        // This handles fresh install, new device, or cleared app data where
+        // isOnboarded may be false in Redux but the profile exists on server.
+        router.replace('/');
       }
     }
   }, [isSignedIn, pendingNavigation]);
@@ -111,45 +106,6 @@ export default function VerifyScreen() {
         });
         if (result.status === 'complete' && setSignInActive) {
           await setSignInActive({ session: result.createdSessionId });
-
-          // createdUserId exists at runtime in Clerk v2 but is absent from the
-          // SignInResource type definition — cast to access it safely.
-          const clerkUserId = (signIn as any).createdUserId ?? '';
-
-          // Always sync the Clerk ID into Redux (handles new device / reinstall).
-          if (clerkUserId) {
-            dispatch(setClerkUser({ clerkUserId, email: email }));
-          }
-
-          // Restore all user data from server — covers reinstall/new device.
-          // On the same device, redux-persist already has the data in SecureStore.
-          if (!reduxUser && clerkUserId) {
-            const today = new Date().toLocaleDateString('en-CA');
-
-            // 1. Restore user profile
-            try {
-              const serverUser = await fetchUserFromServer();
-              if (serverUser) dispatch(restoreUser(serverUser));
-            } catch { /* silent */ }
-
-            // 2. Restore today's meals
-            try {
-              const serverMeals = await fetchMealsFromServer(today);
-              if (serverMeals.length > 0) dispatch(setMeals(serverMeals));
-            } catch { /* non-fatal */ }
-
-            // 3. Restore today's water entries
-            try {
-              const serverWater = await fetchWaterFromServer(today);
-              if (serverWater.length > 0) dispatch(setEntries(serverWater));
-            } catch { /* non-fatal */ }
-
-            // 4. Restore badges
-            try {
-              const serverBadges = await fetchBadgesFromServer();
-              if (serverBadges.length > 0) dispatch(setBadges(serverBadges));
-            } catch { /* non-fatal */ }
-          }
 
           setPendingNavigation(true);
         }
