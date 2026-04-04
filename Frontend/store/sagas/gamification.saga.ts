@@ -1,4 +1,4 @@
-import { put, select, takeLatest } from 'redux-saga/effects';
+import { all, call, put, select, takeLatest } from 'redux-saga/effects';
 import dayjs from 'dayjs';
 
 import {
@@ -8,7 +8,6 @@ import {
   badgeUnlocked,
 } from '../slices/gamification.slice';
 import { syncBadgeToServer } from '@/services/sync.service';
-import { call } from 'redux-saga/effects';
 import type { RootState } from '../root-reducer';
 import type { Meal } from '../slices/meals.slice';
 import type { WaterEntry } from '../slices/water.slice';
@@ -140,6 +139,16 @@ function* refreshGamificationSaga() {
   }
 }
 
-export default function* gamificationSaga() {
+// ─── Watchers ─────────────────────────────────────────────────────────────────
+
+function* watchRefreshGamification() {
   yield takeLatest(refreshGamificationRequest.type, refreshGamificationSaga);
+}
+
+// ─── Domain saga ──────────────────────────────────────────────────────────────
+
+export default function* gamificationSaga() {
+  yield all([
+    call(watchRefreshGamification),
+  ]);
 }

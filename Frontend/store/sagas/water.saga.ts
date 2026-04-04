@@ -1,4 +1,4 @@
-import { call, put, takeEvery } from 'redux-saga/effects';
+import { all, call, put, takeEvery } from 'redux-saga/effects';
 import dayjs from 'dayjs';
 
 import {
@@ -27,6 +27,16 @@ function* addWaterSaga(action: ReturnType<typeof addWaterRequest>) {
   }
 }
 
-export default function* waterSaga() {
+// ─── Watchers ─────────────────────────────────────────────────────────────────
+
+function* watchAddWater() {
   yield takeEvery(addWaterRequest.type, addWaterSaga);
+}
+
+// ─── Domain saga ──────────────────────────────────────────────────────────────
+
+export default function* waterSaga() {
+  yield all([
+    call(watchAddWater),
+  ]);
 }

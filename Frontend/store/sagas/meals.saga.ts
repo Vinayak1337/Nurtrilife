@@ -1,4 +1,4 @@
-import { call, put, select, takeLatest } from 'redux-saga/effects';
+import { all, call, put, select, takeLatest } from 'redux-saga/effects';
 import { PayloadAction } from '@reduxjs/toolkit';
 import * as FileSystem from 'expo-file-system/legacy';
 import { router } from 'expo-router';
@@ -120,8 +120,26 @@ function* deleteMealSaga(action: PayloadAction<string>): Generator {
   }
 }
 
-export default function* mealsSaga() {
+// ─── Watchers ─────────────────────────────────────────────────────────────────
+
+function* watchAnalyzeImage() {
   yield takeLatest(analyzeImageRequest.type, analyzeImageSaga);
+}
+
+function* watchSaveMeal() {
   yield takeLatest(saveMealRequest.type, saveMealSaga);
+}
+
+function* watchDeleteMeal() {
   yield takeLatest(deleteMealRequest.type, deleteMealSaga);
+}
+
+// ─── Domain saga ──────────────────────────────────────────────────────────────
+
+export default function* mealsSaga() {
+  yield all([
+    call(watchAnalyzeImage),
+    call(watchSaveMeal),
+    call(watchDeleteMeal),
+  ]);
 }

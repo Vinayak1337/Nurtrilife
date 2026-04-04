@@ -1,4 +1,4 @@
-import { put, select, takeLatest } from 'redux-saga/effects';
+import { all, call, put, select, takeLatest } from 'redux-saga/effects';
 import dayjs from 'dayjs';
 
 import {
@@ -89,6 +89,16 @@ function* fetchInsightsSaga() {
   }
 }
 
-export default function* insightsSaga() {
+// ─── Watchers ─────────────────────────────────────────────────────────────────
+
+function* watchFetchInsights() {
   yield takeLatest(fetchInsightsRequest.type, fetchInsightsSaga);
+}
+
+// ─── Domain saga ──────────────────────────────────────────────────────────────
+
+export default function* insightsSaga() {
+  yield all([
+    call(watchFetchInsights),
+  ]);
 }

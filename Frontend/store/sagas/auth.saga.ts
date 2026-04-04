@@ -1,4 +1,4 @@
-import { call, put, select, takeLatest } from 'redux-saga/effects';
+import { all, call, put, select, takeLatest } from 'redux-saga/effects';
 import { PayloadAction } from '@reduxjs/toolkit';
 import { router } from 'expo-router';
 
@@ -45,9 +45,31 @@ function* syncUserProfileSaga() {
   }
 }
 
-export default function* authSaga() {
+// ─── Watchers ─────────────────────────────────────────────────────────────────
+
+function* watchLogout() {
   yield takeLatest(logoutRequest.type, logoutSaga);
+}
+
+function* watchCompleteOnboarding() {
   yield takeLatest(completeOnboarding.type, saveUserOnOnboardingSaga);
+}
+
+function* watchUpdateGoals() {
   yield takeLatest(updateGoals.type, syncUserProfileSaga);
+}
+
+function* watchUpdateProfile() {
   yield takeLatest(updateProfile.type, syncUserProfileSaga);
+}
+
+// ─── Domain saga ──────────────────────────────────────────────────────────────
+
+export default function* authSaga() {
+  yield all([
+    call(watchLogout),
+    call(watchCompleteOnboarding),
+    call(watchUpdateGoals),
+    call(watchUpdateProfile),
+  ]);
 }
