@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   View,
   ScrollView,
@@ -98,19 +98,17 @@ export default function HomeScreen() {
   const fatsGoal = user?.dailyFatsGoal ?? 65;
   const waterGoal = user?.dailyWaterGoal ?? 2500;
   const remaining = Math.max(0, calorieGoal - totals.calories);
+  const loadingRecsRef = useRef(false);
+  const recsDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Reload recommendations whenever meals change (captures fresh remaining calories)
-  useEffect(() => {
-    if (meals.length > 0) {
-      loadRecommendations();
-    }
-  }, [meals.length]);
-
-  async function loadRecommendations() {
+  const loadRecommendations = useCallback(async () => {
+    // Prevent concurrent calls
+    if (loadingRecsRef.current) return;
+    loadingRecsRef.current = true;
     setLoadingRecs(true);
     try {
       const recs = await getMealRecommendations(
-        remaining,
+        Math.max(0, calorieGoal - totals.calories),
         Math.max(0, proteinGoal - totals.protein),
         Math.max(0, carbsGoal - totals.carbs),
         Math.max(0, fatsGoal - totals.fats),
@@ -120,12 +118,24 @@ export default function HomeScreen() {
       // Silently fail
     } finally {
       setLoadingRecs(false);
+      loadingRecsRef.current = false;
     }
-  }
+  }, [calorieGoal, proteinGoal, carbsGoal, fatsGoal, totals]);
+
+  // Load recommendations once after meals stabilize — debounced so rapid
+  // Redux updates (persist rehydrate + server sync) only trigger one call.
+  useEffect(() => {
+    if (meals.length === 0) return;
+    if (recsDebounceRef.current) clearTimeout(recsDebounceRef.current);
+    recsDebounceRef.current = setTimeout(loadRecommendations, 1500);
+    return () => {
+      if (recsDebounceRef.current) clearTimeout(recsDebounceRef.current);
+    };
+  }, [meals.length, loadRecommendations]);
 
   function handleRefresh() {
     dispatch(refreshGamificationRequest());
-    setRecommendations([]);
+    loadRecommendations();
   }
 
   function handleAddWater(amount: number) {
