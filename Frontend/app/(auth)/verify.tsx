@@ -250,7 +250,7 @@ export default function VerifyScreen() {
 						style={styles.codeRow}>
 						{code.map((digit, i) => (
 							<TextInput
-								key={`code-input-${i}`}
+								key={`code-input` + i}
 								ref={ref => {
 									inputs.current[i] = ref;
 								}}
