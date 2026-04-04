@@ -2,6 +2,7 @@ import { Controller, Post, Body, BadRequestException, HttpException, HttpStatus,
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { GoogleGenAI } from '@google/genai';
 import { AnalyzeFoodDto } from './dto/analyze-food.dto';
+import { CurrentUser } from '../auth/current-user.decorator';
 
 const ANALYSIS_PROMPT = `Analyze this food image and provide detailed nutritional information.
 
@@ -37,10 +38,10 @@ export class AnalyzeController {
   @Post()
   @ApiOperation({ summary: 'Analyze a food image using Gemini AI' })
   @ApiResponse({ status: 200, description: 'Nutritional analysis result' })
-  @ApiResponse({ status: 400, description: 'Missing imageBase64 or userId' })
-  async analyzeFood(@Body() body: AnalyzeFoodDto) {
-    const { imageBase64, userId } = body;
-    if (!imageBase64 || !userId) throw new BadRequestException('Missing imageBase64 or userId');
+  @ApiResponse({ status: 400, description: 'Missing imageBase64' })
+  async analyzeFood(@CurrentUser() _userId: string, @Body() body: AnalyzeFoodDto) {
+    const { imageBase64 } = body;
+    if (!imageBase64) throw new BadRequestException('Missing imageBase64');
 
     try {
       const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
