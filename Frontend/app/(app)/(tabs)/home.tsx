@@ -30,7 +30,6 @@ import { useTodayMeals, useMealsLoading, useTodayTotals } from '@/hooks/use-meal
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { deleteMealRequest } from '@/store/slices/meals.slice';
 import { addWaterRequest } from '@/store/slices/water.slice';
-import { refreshGamificationRequest } from '@/store/slices/gamification.slice';
 import { syncTodayRequest } from '@/store/slices/auth.slice';
 import { setLastCustomWaterMl } from '@/store/slices/ui.slice';
 import { getMealRecommendations, MealSuggestion } from '@/services/recommendations.service';
