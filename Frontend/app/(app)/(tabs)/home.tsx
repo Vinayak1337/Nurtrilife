@@ -28,9 +28,9 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useUser } from '@/hooks/use-auth';
 import { useTodayMeals, useMealsLoading, useTodayTotals } from '@/hooks/use-meals';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { deleteMealRequest } from '@/store/slices/meals.slice';
+import { deleteMealRequest, Meal } from '@/store/slices/meals.slice';
 import { addWaterRequest } from '@/store/slices/water.slice';
-import { refreshGamificationRequest } from '@/store/slices/gamification.slice';
+import { syncTodayRequest } from '@/store/slices/auth.slice';
 import { setLastCustomWaterMl } from '@/store/slices/ui.slice';
 import { getMealRecommendations, MealSuggestion } from '@/services/recommendations.service';
 import { router } from 'expo-router';
@@ -69,9 +69,9 @@ export default function HomeScreen() {
   const fetchedDateRef = useRef<string>(today);
 
   useEffect(() => {
-    dispatch(refreshGamificationRequest());
+    dispatch(syncTodayRequest());
     fetchedDateRef.current = today;
-  }, [today]);
+  }, [today, dispatch]);
 
   // When the app returns to the foreground, check if the calendar date has
   // changed since the last fetch.  If it has, re-fetch so the home screen
@@ -82,9 +82,9 @@ export default function HomeScreen() {
         const currentDate = dayjs().format('YYYY-MM-DD');
         if (currentDate !== fetchedDateRef.current) {
           fetchedDateRef.current = currentDate;
-          dispatch(refreshGamificationRequest());
           setRecommendations([]);
         }
+        dispatch(syncTodayRequest());
       }
     }
 
@@ -134,7 +134,7 @@ export default function HomeScreen() {
   }, [meals.length, loadRecommendations]);
 
   function handleRefresh() {
-    dispatch(refreshGamificationRequest());
+    dispatch(syncTodayRequest());
     loadRecommendations();
   }
 
@@ -335,7 +335,7 @@ export default function HomeScreen() {
             />
           ) : (
             <View style={styles.mealsList}>
-              {meals.map((meal: import('@/store/slices/meals.slice').Meal, index: number) => (
+              {meals.map((meal: Meal, index: number) => (
                 <MealCard
                   key={meal.id}
                   meal={meal}

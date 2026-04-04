@@ -14,6 +14,8 @@ export interface IUser {
   dailyFatsGoal: number;
   dailyWaterGoal: number;
   healthFocus: string[];
+  currentStreak: number;
+  longestStreak: number;
   updatedAt: string;
 }
 
@@ -30,8 +32,10 @@ export const UserSchema = new Schema(
     dailyProteinGoal: { type: Number, default: 150 },
     dailyCarbsGoal: { type: Number, default: 250 },
     dailyFatsGoal: { type: Number, default: 65 },
-    dailyWaterGoal: { type: Number, default: 2000 },
+    dailyWaterGoal: { type: Number, default: 2500 },
     healthFocus: { type: [String], default: [] },
+    currentStreak: { type: Number, default: 0 },
+    longestStreak: { type: Number, default: 0 },
     updatedAt: { type: String, default: () => new Date().toISOString() },
   },
   { _id: false, versionKey: false },

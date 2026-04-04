@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Body, BadRequestException } from '@nestjs/common';
 import {
   ApiTags,
   ApiBearerAuth,
@@ -17,12 +17,12 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Get the authenticated user profile' })
-  @ApiResponse({ status: 200, description: 'User profile returned' })
+  @ApiOperation({ summary: 'Get or auto-create the authenticated user profile' })
+  @ApiResponse({ status: 200, description: 'User profile returned (auto-created with defaults if new)' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async getUser(@CurrentUser() userId: string) {
-    const user = await this.usersService.findByClerkId(userId);
-    return { success: true, data: user ?? null };
+    const user = await this.usersService.findOrCreate(userId);
+    return { success: true, data: user };
   }
 
   @Post()
@@ -48,12 +48,25 @@ export class UsersController {
       dailyProteinGoal: body.dailyProteinGoal ?? 150,
       dailyCarbsGoal: body.dailyCarbsGoal ?? 250,
       dailyFatsGoal: body.dailyFatsGoal ?? 65,
-      dailyWaterGoal: body.dailyWaterGoal ?? 2000,
+      dailyWaterGoal: body.dailyWaterGoal ?? 2500,
       healthFocus: body.healthFocus ?? [],
+      currentStreak: body.currentStreak ?? 0,
+      longestStreak: body.longestStreak ?? 0,
       updatedAt: new Date().toISOString(),
     };
 
     await this.usersService.upsert(data);
+    return { success: true };
+  }
+
+  @Patch('streak')
+  @ApiOperation({ summary: 'Update the authenticated user streak counts' })
+  @ApiResponse({ status: 200, description: 'Streak updated' })
+  async updateStreak(
+    @CurrentUser() userId: string,
+    @Body() body: { currentStreak: number; longestStreak: number },
+  ) {
+    await this.usersService.updateStreaks(userId, body.currentStreak ?? 0, body.longestStreak ?? 0);
     return { success: true };
   }
 }

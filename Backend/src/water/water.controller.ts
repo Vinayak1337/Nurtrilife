@@ -18,15 +18,25 @@ export class WaterController {
   constructor(private readonly waterService: WaterService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Get water entries for a date' })
-  @ApiQuery({ name: 'date', required: true, description: 'Date (YYYY-MM-DD)' })
+  @ApiOperation({ summary: 'Get water entries for a date or date range' })
+  @ApiQuery({ name: 'date', required: false, description: 'Single date (YYYY-MM-DD)' })
+  @ApiQuery({ name: 'startDate', required: false, description: 'Range start (YYYY-MM-DD)' })
+  @ApiQuery({ name: 'endDate', required: false, description: 'Range end (YYYY-MM-DD)' })
   @ApiResponse({ status: 200, description: 'Water entries returned' })
   async getWater(
     @CurrentUser() userId: string,
-    @Query('date') date: string,
+    @Query('date') date?: string,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
   ) {
-    if (!date) throw new BadRequestException('Missing date');
-    const entries = await this.waterService.findByDate(userId, date);
+    let entries: IWaterEntry[];
+    if (startDate && endDate) {
+      entries = await this.waterService.findByDateRange(userId, startDate, endDate);
+    } else if (date) {
+      entries = await this.waterService.findByDate(userId, date);
+    } else {
+      throw new BadRequestException('Provide date or startDate+endDate');
+    }
     return {
       success: true,
       data: entries.map((e) => ({

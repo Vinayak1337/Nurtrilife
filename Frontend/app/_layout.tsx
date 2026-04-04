@@ -40,7 +40,7 @@ export const unstable_settings = {
   anchor: '(app)',
 };
 
-function AppProviders({ children }: { children: React.ReactNode }) {
+function AppProviders({ children }: Readonly<{ children: React.ReactNode }>) {
   const colorScheme = useColorScheme();
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>

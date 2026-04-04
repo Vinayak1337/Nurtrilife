@@ -15,6 +15,8 @@ export interface User {
   dailyFatsGoal: number;
   dailyWaterGoal: number;
   healthFocus?: string[];
+  currentStreak?: number;
+  longestStreak?: number;
 }
 
 export interface AuthState {
@@ -71,6 +73,9 @@ export const authSlice = createSlice({
     logoutRequest: () => {
       // Saga intercepts this — actual cleanup happens there
     },
+    syncTodayRequest: () => {
+      // Saga intercepts this — fetches today's meals + water, refreshes gamification
+    },
     /** Restore a full user profile fetched from SQLite on sign-in.
      *  Used when Redux persist was wiped (e.g. reinstall) but the
      *  SQLite database still holds the user's profile. */
@@ -94,7 +99,7 @@ export const authSlice = createSlice({
   },
 });
 
-export const { completeOnboarding, updateGoals, updateProfile, logout, logoutRequest, setClerkUser, restoreUser } = authSlice.actions;
+export const { completeOnboarding, updateGoals, updateProfile, logout, logoutRequest, syncTodayRequest, setClerkUser, restoreUser } = authSlice.actions;
 export default authSlice.reducer;
 
 // Default user factory

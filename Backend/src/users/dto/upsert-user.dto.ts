@@ -31,9 +31,15 @@ export class UpsertUserDto {
   @ApiPropertyOptional({ default: 65, description: 'Daily fats goal (g)' })
   dailyFatsGoal?: number;
 
-  @ApiPropertyOptional({ default: 2000, description: 'Daily water goal (ml)' })
+  @ApiPropertyOptional({ default: 2500, description: 'Daily water goal (ml)' })
   dailyWaterGoal?: number;
 
   @ApiPropertyOptional({ type: [String], description: 'Health focus areas' })
   healthFocus?: string[];
+
+  @ApiPropertyOptional({ default: 0, description: 'Current logging streak (days)' })
+  currentStreak?: number;
+
+  @ApiPropertyOptional({ default: 0, description: 'Longest logging streak ever (days)' })
+  longestStreak?: number;
 }

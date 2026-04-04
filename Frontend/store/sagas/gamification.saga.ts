@@ -7,7 +7,7 @@ import {
   setBadges,
   badgeUnlocked,
 } from '../slices/gamification.slice';
-import { syncBadgeToServer } from '@/services/sync.service';
+import { syncBadgeToServer, syncStreakToServer } from '@/services/sync.service';
 import type { RootState } from '../root-reducer';
 import type { Meal } from '../slices/meals.slice';
 import type { WaterEntry } from '../slices/water.slice';
@@ -74,6 +74,7 @@ function* refreshGamificationSaga() {
     const currentStreak = computeConsecutiveLogDays(meals);
     const longestStreak = computeLongestStreak(meals);
     yield put(setStreaks({ current: currentStreak, longest: longestStreak }));
+    yield call(syncStreakToServer, currentStreak, longestStreak);
     yield put(setBadges(existingBadges));
 
     // Stats

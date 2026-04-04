@@ -11,6 +11,13 @@ export class WaterService {
     return this.waterModel.find({ clerkUserId, date }).sort({ createdAt: -1 }).lean();
   }
 
+  async findByDateRange(clerkUserId: string, startDate: string, endDate: string): Promise<IWaterEntry[]> {
+    return this.waterModel
+      .find({ clerkUserId, date: { $gte: startDate, $lte: endDate } })
+      .sort({ createdAt: -1 })
+      .lean();
+  }
+
   async upsert(data: IWaterEntry): Promise<void> {
     await this.waterModel.replaceOne({ _id: data._id }, data, { upsert: true });
   }
