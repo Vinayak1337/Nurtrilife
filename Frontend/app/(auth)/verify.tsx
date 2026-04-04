@@ -21,13 +21,14 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { setClerkUser, restoreUser } from '@/store/slices/auth.slice';
 import { setMeals } from '@/store/slices/meals.slice';
 import { setEntries } from '@/store/slices/water.slice';
-import { setBadges } from '@/store/slices/gamification.slice';
+import { setBadges, setStreaks } from '@/store/slices/gamification.slice';
 import {
   fetchUserFromServer,
   fetchMealsFromServer,
   fetchWaterFromServer,
   fetchBadgesFromServer,
 } from '@/services/sync.service';
+import dayjs from 'dayjs';
 
 const CODE_LENGTH = 6;
 
@@ -61,15 +62,26 @@ export default function VerifyScreen() {
     async function syncAndNavigate() {
       setSyncing(true);
       try {
-        const today = new Date().toLocaleDateString('en-CA');
+        const today = dayjs().format('YYYY-MM-DD');
+        const thirtyDaysAgo = dayjs().subtract(29, 'day').format('YYYY-MM-DD');
 
+        // GET /api/user now auto-creates with defaults if missing — never returns null
         const serverUser = await fetchUserFromServer();
         if (serverUser) {
           dispatch(restoreUser(serverUser));
 
+          // Restore server streak immediately (before meal recomputation)
+          if (serverUser.currentStreak || serverUser.longestStreak) {
+            dispatch(setStreaks({
+              current: serverUser.currentStreak ?? 0,
+              longest: serverUser.longestStreak ?? 0,
+            }));
+          }
+
+          // Fetch last 30 days of meals + water so streak recomputation is accurate
           const [serverMeals, serverWater, serverBadges] = await Promise.all([
-            fetchMealsFromServer(today),
-            fetchWaterFromServer(today),
+            fetchMealsFromServer(undefined, thirtyDaysAgo, today),
+            fetchWaterFromServer(undefined, thirtyDaysAgo, today),
             fetchBadgesFromServer(),
           ]);
           if (serverMeals.length > 0) dispatch(setMeals(serverMeals));
@@ -78,7 +90,7 @@ export default function VerifyScreen() {
 
           router.replace('/(app)/(tabs)/home');
         } else {
-          // No profile on server — new device or first time, go to setup
+          // Fallback (shouldn't happen — findOrCreate always returns a user)
           router.replace('/(auth)/setup');
         }
       } catch {

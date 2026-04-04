@@ -84,13 +84,22 @@ export async function deleteMealFromServer(mealId: string): Promise<void> {
   }
 }
 
-/** Fetch meals from server for a specific date. Returns [] on error. */
-export async function fetchMealsFromServer(date: string): Promise<Meal[]> {
+/** Fetch meals from server for a specific date or date range. Returns [] on error. */
+export async function fetchMealsFromServer(
+  date?: string,
+  startDate?: string,
+  endDate?: string,
+): Promise<Meal[]> {
   try {
-    const res = await fetch(
-      `${getApiBase()}/api/meals?date=${encodeURIComponent(date)}`,
-      { headers: await authHeaders() },
-    );
+    let url = `${getApiBase()}/api/meals`;
+    if (startDate && endDate) {
+      url += `?startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}`;
+    } else if (date) {
+      url += `?date=${encodeURIComponent(date)}`;
+    } else {
+      return [];
+    }
+    const res = await fetch(url, { headers: await authHeaders() });
     const data = await res.json();
     if (data.success && Array.isArray(data.data)) return data.data as Meal[];
     return [];
@@ -114,18 +123,42 @@ export async function syncWaterToServer(entry: WaterEntry): Promise<void> {
   }
 }
 
-/** Fetch water entries from server for a specific date. Returns [] on error. */
-export async function fetchWaterFromServer(date: string): Promise<WaterEntry[]> {
+/** Fetch water entries from server for a specific date or date range. Returns [] on error. */
+export async function fetchWaterFromServer(
+  date?: string,
+  startDate?: string,
+  endDate?: string,
+): Promise<WaterEntry[]> {
   try {
-    const res = await fetch(
-      `${getApiBase()}/api/water?date=${encodeURIComponent(date)}`,
-      { headers: await authHeaders() },
-    );
+    let url = `${getApiBase()}/api/water`;
+    if (startDate && endDate) {
+      url += `?startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}`;
+    } else if (date) {
+      url += `?date=${encodeURIComponent(date)}`;
+    } else {
+      return [];
+    }
+    const res = await fetch(url, { headers: await authHeaders() });
     const data = await res.json();
     if (data.success && Array.isArray(data.data)) return data.data as WaterEntry[];
     return [];
   } catch {
     return [];
+  }
+}
+
+// ─── Streak ───────────────────────────────────────────────────────────────────
+
+/** Fire-and-forget: pushes recomputed streak counts to the server. */
+export async function syncStreakToServer(currentStreak: number, longestStreak: number): Promise<void> {
+  try {
+    await fetch(`${getApiBase()}/api/user/streak`, {
+      method: 'PATCH',
+      headers: await authHeaders(),
+      body: JSON.stringify({ currentStreak, longestStreak }),
+    });
+  } catch {
+    // non-fatal — local gamification state is source of truth
   }
 }
 

@@ -31,6 +31,7 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { deleteMealRequest } from '@/store/slices/meals.slice';
 import { addWaterRequest } from '@/store/slices/water.slice';
 import { refreshGamificationRequest } from '@/store/slices/gamification.slice';
+import { syncTodayRequest } from '@/store/slices/auth.slice';
 import { setLastCustomWaterMl } from '@/store/slices/ui.slice';
 import { getMealRecommendations, MealSuggestion } from '@/services/recommendations.service';
 import { router } from 'expo-router';
@@ -69,7 +70,7 @@ export default function HomeScreen() {
   const fetchedDateRef = useRef<string>(today);
 
   useEffect(() => {
-    dispatch(refreshGamificationRequest());
+    dispatch(syncTodayRequest());
     fetchedDateRef.current = today;
   }, [today]);
 
@@ -82,9 +83,9 @@ export default function HomeScreen() {
         const currentDate = dayjs().format('YYYY-MM-DD');
         if (currentDate !== fetchedDateRef.current) {
           fetchedDateRef.current = currentDate;
-          dispatch(refreshGamificationRequest());
           setRecommendations([]);
         }
+        dispatch(syncTodayRequest());
       }
     }
 
@@ -134,7 +135,7 @@ export default function HomeScreen() {
   }, [meals.length, loadRecommendations]);
 
   function handleRefresh() {
-    dispatch(refreshGamificationRequest());
+    dispatch(syncTodayRequest());
     loadRecommendations();
   }
 
