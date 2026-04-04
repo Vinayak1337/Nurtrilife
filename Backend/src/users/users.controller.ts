@@ -48,10 +48,10 @@ export class UsersController {
       dailyProteinGoal: body.dailyProteinGoal ?? 150,
       dailyCarbsGoal: body.dailyCarbsGoal ?? 250,
       dailyFatsGoal: body.dailyFatsGoal ?? 65,
-      dailyWaterGoal: body.dailyWaterGoal ?? 2000,
+      dailyWaterGoal: body.dailyWaterGoal ?? 2500,
       healthFocus: body.healthFocus ?? [],
-      currentStreak: (body as any).currentStreak ?? 0,
-      longestStreak: (body as any).longestStreak ?? 0,
+      currentStreak: body.currentStreak ?? 0,
+      longestStreak: body.longestStreak ?? 0,
       updatedAt: new Date().toISOString(),
     };
 

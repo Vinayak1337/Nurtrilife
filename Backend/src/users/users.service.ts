@@ -23,7 +23,7 @@ export class UsersService {
       dailyProteinGoal: 150,
       dailyCarbsGoal: 250,
       dailyFatsGoal: 65,
-      dailyWaterGoal: 2000,
+      dailyWaterGoal: 2500,
       healthFocus: [],
       currentStreak: 0,
       longestStreak: 0,
