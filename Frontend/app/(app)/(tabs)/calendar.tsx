@@ -12,7 +12,7 @@ import dayjs from 'dayjs';
 import { AppText } from '@/components/ui/text';
 import { Card } from '@/components/ui/card';
 import { MealCard } from '@/components/ui/meal-card';
-import { Colors, Palette, Spacing, Radius } from '@/constants/theme';
+import { Colors, Palette, Spacing } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useUser } from '@/hooks/use-auth';
 import { useAppSelector } from '@/store/hooks';

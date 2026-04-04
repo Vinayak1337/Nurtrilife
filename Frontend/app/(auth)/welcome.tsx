@@ -36,7 +36,7 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 //  SVG Illustrations
 // ─────────────────────────────────────────────────────────────
 
-function ScanIllustration({ color }: { color: string }) {
+function ScanIllustration({ color }: Readonly<{ color: string }>) {
   return (
     <Svg width={220} height={220} viewBox="0 0 220 220">
       <Defs>
@@ -66,7 +66,7 @@ function ScanIllustration({ color }: { color: string }) {
   );
 }
 
-function ChartIllustration({ color }: { color: string }) {
+function ChartIllustration({ color }: Readonly<{ color: string }>) {
   return (
     <Svg width={220} height={220} viewBox="0 0 220 220">
       <Defs>
@@ -98,7 +98,7 @@ function ChartIllustration({ color }: { color: string }) {
   );
 }
 
-function TargetIllustration({ color }: { color: string }) {
+function TargetIllustration({ color }: Readonly<{ color: string }>) {
   return (
     <Svg width={220} height={220} viewBox="0 0 220 220">
       <Defs>
@@ -244,7 +244,7 @@ export default function WelcomeScreen() {
 //  Slide
 // ─────────────────────────────────────────────────────────────
 
-function Slide({ slide }: { slide: typeof SLIDES[number] }) {
+function Slide({ slide }: Readonly<{ slide: typeof SLIDES[number] }>) {
   const { Illustration, accent, title, subtitle } = slide;
   return (
     <View style={[styles.slide, { width: SCREEN_WIDTH }]}>
@@ -278,12 +278,12 @@ function DotIndicator({
   currentIndex,
   color,
   scrollX,
-}: {
+}: Readonly<{
   index: number;
   currentIndex: number;
   color: string;
   scrollX: SharedValue<number>;
-}) {
+}>) {
   const isActive = index === currentIndex;
   const animStyle = useAnimatedStyle(() => {
     const position = scrollX.value / SCREEN_WIDTH;

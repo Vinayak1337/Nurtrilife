@@ -135,14 +135,17 @@ export default function VerifyScreen() {
 				.slice(0, CODE_LENGTH);
 			if (chars.length === CODE_LENGTH) {
 				setCode(chars);
-				inputs.current[CODE_LENGTH - 1]?.focus();
+				setTimeout(() => inputs.current[CODE_LENGTH - 1]?.focus(), 0);
 			}
 			return;
 		}
 		newCode[index] = text.slice(-1);
 		setCode(newCode);
 		if (text && index < CODE_LENGTH - 1) {
-			inputs.current[index + 1]?.focus();
+			// Defer focus so React finishes the current render cycle before
+			// moving the cursor — prevents autoFocus on a remounted sibling
+			// from stealing it back on iOS.
+			setTimeout(() => inputs.current[index + 1]?.focus(), 0);
 		}
 	}
 
@@ -247,7 +250,7 @@ export default function VerifyScreen() {
 						style={styles.codeRow}>
 						{code.map((digit, i) => (
 							<TextInput
-								key={i + 'code' + digit}
+								key={`code-input-${i}`}
 								ref={ref => {
 									inputs.current[i] = ref;
 								}}

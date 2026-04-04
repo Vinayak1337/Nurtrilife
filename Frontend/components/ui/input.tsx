@@ -24,16 +24,17 @@ export function Input({
   inputContainerStyle,
   style,
   ...props
-}: InputProps) {
+}: Readonly<InputProps>) {
   const colorScheme = useColorScheme() ?? 'light';
   const theme = Colors[colorScheme];
   const [focused, setFocused] = useState(false);
 
-  const borderColor = error
-    ? theme.accent
-    : focused
-    ? theme.borderFocused
-    : theme.border;
+  let borderColor = theme.border;
+  if (error) {
+    borderColor = theme.accent;
+  } else if (focused) {
+    borderColor = theme.borderFocused;
+  }
 
   return (
     <View style={[styles.container, containerStyle]}>
