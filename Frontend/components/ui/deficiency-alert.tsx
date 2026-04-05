@@ -3,7 +3,7 @@ import { View, StyleSheet } from 'react-native';
 
 import { AppText } from './text';
 import { IconSymbol } from './icon-symbol';
-import { Colors, Radius, Spacing } from '@/constants/theme';
+import { Colors, Radius, Spacing, Palette, Shadow } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import type { DeficiencyAlert as AlertType } from '@/utils/deficiency-detector';
 
@@ -33,9 +33,9 @@ export function DeficiencyAlertCard({ alert }: Readonly<{ alert: AlertType }>) {
 					<View
 						style={[
 							styles.badge,
-							{ backgroundColor: isAlert ? '#EF444420' : '#F59E0B20' }
+							{ backgroundColor: isAlert ? `${Palette.accent}20` : `${Palette.secondary}20` }
 						]}>
-						<AppText variant='caption' color={isAlert ? '#EF4444' : '#F59E0B'}>
+						<AppText variant='caption' color={isAlert ? Palette.accent : Palette.secondary}>
 							{isAlert ? 'Alert' : 'Warning'}
 						</AppText>
 					</View>
@@ -63,11 +63,7 @@ const styles = StyleSheet.create({
 		borderRadius: Radius.lg,
 		padding: Spacing.base,
 		marginBottom: Spacing.sm,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 1 },
-		shadowOpacity: 0.05,
-		shadowRadius: 3,
-		elevation: 1
+		...Shadow.sm
 	},
 	header: {
 		flexDirection: 'row',

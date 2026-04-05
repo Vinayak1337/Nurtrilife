@@ -38,11 +38,18 @@ const waterSlice = createSlice({
       state.error = action.payload;
     },
 
-    // Bulk-merge entries from server (sign-in restore)
+    // Full replace from server (sign-in restore) — server is source of truth.
     setEntries: (state, action: PayloadAction<WaterEntry[]>) => {
-      const localIds = new Set(state.entries.map((e) => e.id));
-      const incoming = action.payload.filter((e) => !localIds.has(e.id));
-      state.entries = [...state.entries, ...incoming].sort(
+      state.entries = action.payload
+        .slice()
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    },
+
+    // Replace entries for a single date, keep all other dates intact.
+    replaceEntriesForDate: (state, action: PayloadAction<{ date: string; entries: WaterEntry[] }>) => {
+      const { date, entries } = action.payload;
+      const otherDays = state.entries.filter((e) => e.date !== date);
+      state.entries = [...otherDays, ...entries].sort(
         (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
       );
     },
@@ -58,6 +65,7 @@ export const {
   addWaterSuccess,
   addWaterFailure,
   setEntries,
+  replaceEntriesForDate,
   clearEntries,
 } = waterSlice.actions;
 

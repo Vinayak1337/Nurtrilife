@@ -21,4 +21,8 @@ export class WaterService {
   async upsert(data: IWaterEntry): Promise<void> {
     await this.waterModel.replaceOne({ _id: data._id }, data, { upsert: true });
   }
+
+  async delete(id: string, clerkUserId: string): Promise<void> {
+    await this.waterModel.deleteOne({ _id: id, clerkUserId });
+  }
 }

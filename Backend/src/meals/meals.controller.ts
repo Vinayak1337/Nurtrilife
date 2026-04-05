@@ -38,10 +38,14 @@ export class MealsController {
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string,
   ) {
+    const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
     let meals: IMeal[];
     if (startDate && endDate) {
+      if (!DATE_RE.test(startDate) || !DATE_RE.test(endDate))
+        throw new BadRequestException('startDate and endDate must be YYYY-MM-DD');
       meals = await this.mealsService.findByDateRange(userId, startDate, endDate);
     } else if (date) {
+      if (!DATE_RE.test(date)) throw new BadRequestException('date must be YYYY-MM-DD');
       meals = await this.mealsService.findByDate(userId, date);
     } else {
       throw new BadRequestException('Provide date or startDate+endDate');

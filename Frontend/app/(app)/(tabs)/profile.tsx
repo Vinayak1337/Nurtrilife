@@ -20,7 +20,7 @@ import { AppText } from '@/components/ui/text';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { IconSymbol, IconSymbolName } from '@/components/ui/icon-symbol';
-import { Colors, Palette, Radius, Spacing } from '@/constants/theme';
+import { Colors, FontFamily, Palette, Radius, Spacing } from '@/constants/theme';
 import { NUTRIENT_META } from '@/constants/nutrition';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useUser } from '@/hooks/use-auth';
@@ -511,9 +511,9 @@ const styles = StyleSheet.create({
 		marginBottom: Spacing.sm
 	},
 	initials: {
-		fontFamily: 'SpaceGrotesk_700Bold',
+		fontFamily: FontFamily.bold,
 		fontSize: 32,
-		color: '#FFF'
+		color: Palette.white
 	},
 	statsCard: { marginBottom: Spacing.xl },
 	statsRow: {
@@ -572,7 +572,7 @@ const styles = StyleSheet.create({
 		borderRadius: Radius.lg,
 		padding: Spacing.base,
 		fontSize: 18,
-		fontFamily: 'SpaceGrotesk_500Medium',
+		fontFamily: FontFamily.medium,
 		height: 56
 	}
 });

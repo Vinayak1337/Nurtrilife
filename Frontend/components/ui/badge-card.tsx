@@ -3,7 +3,7 @@ import { View, StyleSheet } from 'react-native';
 
 import { AppText } from './text';
 import { IconSymbol } from './icon-symbol';
-import { Colors, Radius, Spacing } from '@/constants/theme';
+import { Colors, Radius, Spacing, Shadow, FontSize } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { BadgeDefinition } from '@/constants/badges';
 
@@ -63,11 +63,7 @@ const styles = StyleSheet.create({
 		padding: Spacing.md,
 		borderRadius: Radius.lg,
 		gap: 6,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 1 },
-		shadowOpacity: 0.05,
-		shadowRadius: 3,
-		elevation: 1
+		...Shadow.sm
 	},
 	locked: {
 		opacity: 0.5
@@ -75,7 +71,7 @@ const styles = StyleSheet.create({
 	iconWrap: {
 		width: 44,
 		height: 44,
-		borderRadius: 22,
+		borderRadius: Radius.full,
 		alignItems: 'center',
 		justifyContent: 'center'
 	},
@@ -84,7 +80,7 @@ const styles = StyleSheet.create({
 	},
 	desc: {
 		textAlign: 'center',
-		fontSize: 10,
+		fontSize: FontSize.xs,
 		lineHeight: 14
 	}
 });

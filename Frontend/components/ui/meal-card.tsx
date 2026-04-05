@@ -6,7 +6,7 @@ import ReanimatedSwipeable from 'react-native-gesture-handler/ReanimatedSwipeabl
 import * as Haptics from 'expo-haptics';
 import { AppText } from './text';
 import { IconSymbol } from './icon-symbol';
-import { Colors, Radius, Spacing, Palette } from '@/constants/theme';
+import { Colors, Radius, Spacing, Palette, FontFamily, FontSize } from '@/constants/theme';
 import { MEAL_TYPE_META, NUTRIENT_META } from '@/constants/nutrition';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Meal } from '@/store/slices/meals.slice';
@@ -46,8 +46,8 @@ export function MealCard({
 		if (!onDelete) return null;
 		return (
 			<Pressable onPress={handleDelete} style={styles.deleteAction}>
-				<IconSymbol name='trash.fill' size={22} color='#FFFFFF' />
-				<AppText variant='caption' color='#FFFFFF'>
+				<IconSymbol name='trash.fill' size={22} color={Palette.white} />
+				<AppText variant='caption' color={Palette.white}>
 					Delete
 				</AppText>
 			</Pressable>
@@ -125,8 +125,8 @@ export function MealCard({
 			<View style={styles.calorieContainer}>
 				<AppText
 					style={{
-						fontFamily: 'SpaceGrotesk_700Bold',
-						fontSize: 20,
+						fontFamily: FontFamily.bold,
+						fontSize: FontSize.lg,
 						color: Palette.secondary
 					}}>
 					{Math.round(meal.calories)}
@@ -222,7 +222,7 @@ const styles = StyleSheet.create({
 		minWidth: 48
 	},
 	deleteAction: {
-		backgroundColor: '#EF4444',
+		backgroundColor: Palette.accent,
 		justifyContent: 'center',
 		alignItems: 'center',
 		width: 80,
