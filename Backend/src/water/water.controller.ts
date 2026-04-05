@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Query, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Body, Query, Param, BadRequestException } from '@nestjs/common';
 import {
   ApiTags,
   ApiBearerAuth,
@@ -29,10 +29,14 @@ export class WaterController {
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string,
   ) {
+    const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
     let entries: IWaterEntry[];
     if (startDate && endDate) {
+      if (!DATE_RE.test(startDate) || !DATE_RE.test(endDate))
+        throw new BadRequestException('startDate and endDate must be YYYY-MM-DD');
       entries = await this.waterService.findByDateRange(userId, startDate, endDate);
     } else if (date) {
+      if (!DATE_RE.test(date)) throw new BadRequestException('date must be YYYY-MM-DD');
       entries = await this.waterService.findByDate(userId, date);
     } else {
       throw new BadRequestException('Provide date or startDate+endDate');
@@ -60,15 +64,29 @@ export class WaterController {
     const id = entry?.id ?? entry?._id;
     if (!id) throw new BadRequestException('Missing entry id');
 
+    const now = new Date().toISOString();
     const doc: IWaterEntry = {
       _id: id,
       clerkUserId: userId,
       amount: entry.amount,
       date: entry.date,
-      createdAt: entry.createdAt ?? new Date().toISOString(),
+      createdAt: entry.createdAt ?? now,
+      updatedAt: now,
     };
 
     await this.waterService.upsert(doc);
+    return { success: true };
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Delete a water entry by ID' })
+  @ApiResponse({ status: 200, description: 'Water entry deleted' })
+  async deleteWater(
+    @Param('id') id: string,
+    @CurrentUser() userId: string,
+  ) {
+    if (!id) throw new BadRequestException('Missing entry id');
+    await this.waterService.delete(id, userId);
     return { success: true };
   }
 }

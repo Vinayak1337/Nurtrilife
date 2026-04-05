@@ -2,6 +2,9 @@ import { Controller, Post, Body, BadRequestException, HttpException, HttpStatus,
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { GoogleGenAI } from '@google/genai';
 import { RecommendDto } from './dto/recommend.dto';
+import { CurrentUser } from '../auth/current-user.decorator';
+
+const VALID_MEAL_TYPES = ['breakfast', 'lunch', 'dinner', 'snack'] as const;
 
 @ApiTags('recommend')
 @ApiBearerAuth('clerk-jwt')
@@ -10,9 +13,12 @@ export class RecommendController {
   @Post()
   @ApiOperation({ summary: 'Get AI meal recommendations based on remaining nutritional targets' })
   @ApiResponse({ status: 200, description: '3 meal suggestions returned' })
-  async getRecommendations(@Body() body: RecommendDto) {
+  async getRecommendations(@CurrentUser() _userId: string, @Body() body: RecommendDto) {
     const { remainingCalories, remainingProtein, remainingCarbs, remainingFats, mealType } = body;
     if (remainingCalories == null) throw new BadRequestException('Missing required fields');
+
+    // Validate mealType against whitelist to prevent prompt injection
+    const safeMealType = VALID_MEAL_TYPES.includes(mealType as any) ? mealType : undefined;
 
     try {
       const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
@@ -23,7 +29,7 @@ export class RecommendController {
 - Carbs: ${remainingCarbs}g
 - Fats: ${remainingFats}g
 
-Suggest exactly 3 ${mealType || 'meal'} options that would help meet these remaining goals.
+Suggest exactly 3 ${safeMealType || 'meal'} options that would help meet these remaining goals.
 Each suggestion should be a realistic, common food item or simple meal.
 
 Return ONLY a JSON array (no markdown fences) with this structure:

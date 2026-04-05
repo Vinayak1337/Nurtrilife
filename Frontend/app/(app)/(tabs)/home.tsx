@@ -22,7 +22,7 @@ import { IconSymbol } from '@/components/ui/icon-symbol';
 import { WaterTracker } from '@/components/ui/water-tracker';
 import { RecommendationCard } from '@/components/ui/recommendation-card';
 import { EmptyState } from '@/components/ui/empty-state';
-import { Colors, Palette, Spacing } from '@/constants/theme';
+import { Colors, FontFamily, FontSize, Palette, Spacing } from '@/constants/theme';
 import { NUTRIENT_META } from '@/constants/nutrition';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useUser } from '@/hooks/use-auth';
@@ -238,7 +238,7 @@ export default function HomeScreen() {
                 consumed={totals.protein}
                 goal={proteinGoal}
                 color={NUTRIENT_META.protein.color}
-                mutedColor={colorScheme === 'dark' ? 'rgba(59,130,246,0.12)' : NUTRIENT_META.protein.mutedColor}
+                mutedColor={theme.proteinMuted}
                 unit="g"
               />
               <MacroBar
@@ -246,7 +246,7 @@ export default function HomeScreen() {
                 consumed={totals.carbs}
                 goal={carbsGoal}
                 color={NUTRIENT_META.carbs.color}
-                mutedColor={colorScheme === 'dark' ? 'rgba(245,158,11,0.12)' : NUTRIENT_META.carbs.mutedColor}
+                mutedColor={theme.carbsMuted}
                 unit="g"
               />
               <MacroBar
@@ -254,7 +254,7 @@ export default function HomeScreen() {
                 consumed={totals.fats}
                 goal={fatsGoal}
                 color={NUTRIENT_META.fats.color}
-                mutedColor={colorScheme === 'dark' ? 'rgba(239,68,68,0.12)' : NUTRIENT_META.fats.mutedColor}
+                mutedColor={theme.fatsMuted}
                 unit="g"
               />
             </View>
@@ -358,7 +358,7 @@ function StatItem({ label, value, unit, color }: { label: string; value: string;
   return (
     <View style={styles.statItem}>
       <AppText variant="caption" color={theme.textTertiary} align="center">{label}</AppText>
-      <AppText style={{ fontFamily: 'SpaceGrotesk_700Bold', fontSize: 20, color, textAlign: 'center' }}>
+      <AppText style={{ fontFamily: FontFamily.bold, fontSize: FontSize.lg, color, textAlign: 'center' }}>
         {value}
       </AppText>
       <AppText variant="caption" color={theme.textTertiary} align="center">{unit}</AppText>
@@ -403,8 +403,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   divider: {
-    height: 1,
-    backgroundColor: 'rgba(128,128,128,0.1)',
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: 'rgba(128,128,128,0.15)',
   },
   macroCard: { marginBottom: Spacing.base },
   macros: { gap: Spacing.base },

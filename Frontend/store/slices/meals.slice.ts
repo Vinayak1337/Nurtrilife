@@ -62,11 +62,21 @@ export const mealsSlice = createSlice({
       state.error = action.payload;
     },
 
-    // Bulk-merge meals from server (sign-in restore)
+    // Full replace from server (sign-in restore) — server is source of truth.
+    // Overwrites all local state so stale/deleted meals don't linger.
     setMeals: (state, action: PayloadAction<Meal[]>) => {
-      const localIds = new Set(state.meals.map((m) => m.id));
-      const incoming = action.payload.filter((m) => !localIds.has(m.id));
-      state.meals = [...state.meals, ...incoming].sort(
+      state.meals = action.payload
+        .slice()
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    },
+
+    // Replace meals for a single date only, keep all other dates intact.
+    // Used by foreground sync so cross-device deletions for today are reflected
+    // without wiping historical data.
+    replaceMealsForDate: (state, action: PayloadAction<{ date: string; meals: Meal[] }>) => {
+      const { date, meals } = action.payload;
+      const otherDays = state.meals.filter((m) => m.date !== date);
+      state.meals = [...otherDays, ...meals].sort(
         (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
       );
     },
@@ -89,6 +99,7 @@ export const {
   deleteMealSuccess,
   deleteMealFailure,
   setMeals,
+  replaceMealsForDate,
   clearMeals,
   clearError,
 } = mealsSlice.actions;

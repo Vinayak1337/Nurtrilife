@@ -6,7 +6,7 @@ import {
 	StyleProp,
 	ViewStyle
 } from 'react-native';
-import { Colors, Radius, Shadow, Spacing } from '@/constants/theme';
+import { Colors, Radius, Shadow, Spacing, Palette } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
 interface CardProps extends ViewProps {
@@ -33,7 +33,7 @@ export function Card({
 				{ backgroundColor: theme.surface, padding: paddingValue },
 				elevated && Shadow.md,
 				elevated && {
-					shadowColor: colorScheme === 'dark' ? '#000' : '#94A3B8'
+					shadowColor: colorScheme === 'dark' ? Palette.black : Palette.gray300
 				},
 				style
 			]}

@@ -90,22 +90,19 @@ export async function fetchMealsFromServer(
   startDate?: string,
   endDate?: string,
 ): Promise<Meal[]> {
-  try {
-    let url = `${getApiBase()}/api/meals`;
-    if (startDate && endDate) {
-      url += `?startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}`;
-    } else if (date) {
-      url += `?date=${encodeURIComponent(date)}`;
-    } else {
-      return [];
-    }
-    const res = await fetch(url, { headers: await authHeaders() });
-    const data = await res.json();
-    if (data.success && Array.isArray(data.data)) return data.data as Meal[];
-    return [];
-  } catch {
+  let url = `${getApiBase()}/api/meals`;
+  if (startDate && endDate) {
+    url += `?startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}`;
+  } else if (date) {
+    url += `?date=${encodeURIComponent(date)}`;
+  } else {
     return [];
   }
+  const res = await fetch(url, { headers: await authHeaders() });
+  if (!res.ok) throw new Error(`fetchMeals failed: ${res.status}`);
+  const data = await res.json();
+  if (data.success && Array.isArray(data.data)) return data.data as Meal[];
+  return [];
 }
 
 // ─── Water ────────────────────────────────────────────────────────────────────
@@ -123,28 +120,25 @@ export async function syncWaterToServer(entry: WaterEntry): Promise<void> {
   }
 }
 
-/** Fetch water entries from server for a specific date or date range. Returns [] on error. */
+/** Fetch water entries from server for a specific date or date range. Throws on HTTP error. */
 export async function fetchWaterFromServer(
   date?: string,
   startDate?: string,
   endDate?: string,
 ): Promise<WaterEntry[]> {
-  try {
-    let url = `${getApiBase()}/api/water`;
-    if (startDate && endDate) {
-      url += `?startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}`;
-    } else if (date) {
-      url += `?date=${encodeURIComponent(date)}`;
-    } else {
-      return [];
-    }
-    const res = await fetch(url, { headers: await authHeaders() });
-    const data = await res.json();
-    if (data.success && Array.isArray(data.data)) return data.data as WaterEntry[];
-    return [];
-  } catch {
+  let url = `${getApiBase()}/api/water`;
+  if (startDate && endDate) {
+    url += `?startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}`;
+  } else if (date) {
+    url += `?date=${encodeURIComponent(date)}`;
+  } else {
     return [];
   }
+  const res = await fetch(url, { headers: await authHeaders() });
+  if (!res.ok) throw new Error(`fetchWater failed: ${res.status}`);
+  const data = await res.json();
+  if (data.success && Array.isArray(data.data)) return data.data as WaterEntry[];
+  return [];
 }
 
 // ─── Streak ───────────────────────────────────────────────────────────────────

@@ -12,7 +12,7 @@ import dayjs from 'dayjs';
 import { AppText } from '@/components/ui/text';
 import { Card } from '@/components/ui/card';
 import { MealCard } from '@/components/ui/meal-card';
-import { Colors, Palette, Spacing } from '@/constants/theme';
+import { Colors, FontFamily, Palette, Spacing } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useUser } from '@/hooks/use-auth';
 import { useAppSelector } from '@/store/hooks';
@@ -141,9 +141,9 @@ export default function CalendarScreen() {
                 selectedDayBackgroundColor: `${Palette.primary}20`,
                 arrowColor: Palette.primary,
                 monthTextColor: theme.text,
-                textDayFontFamily: 'SpaceGrotesk_500Medium',
-                textMonthFontFamily: 'SpaceGrotesk_700Bold',
-                textDayHeaderFontFamily: 'SpaceGrotesk_600SemiBold',
+                textDayFontFamily: FontFamily.medium,
+                textMonthFontFamily: FontFamily.bold,
+                textDayHeaderFontFamily: FontFamily.semiBold,
                 textDayFontSize: 14,
                 textMonthFontSize: 18,
                 textDayHeaderFontSize: 12,

@@ -77,7 +77,7 @@ export default function InsightsScreen() {
 				</View>
 				<EmptyState
 					icon='exclamationmark.triangle.fill'
-					iconColor='#EF4444'
+					iconColor={Palette.accent}
 					title="Couldn't Load Insights"
 					subtitle='Something went wrong fetching your data. Pull down to retry.'
 					actionLabel='Retry'
@@ -191,7 +191,7 @@ export default function InsightsScreen() {
 									</AppText>
 								</View>
 								<AppText variant='caption' color={theme.textTertiary}>
-									Longest: {longestStreak} days
+									Longest: {longestStreak} {longestStreak === 1 ? 'day' : 'days'}
 								</AppText>
 							</View>
 							<View

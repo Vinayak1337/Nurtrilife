@@ -12,10 +12,9 @@ export class UsersService {
   }
 
   async findOrCreate(clerkUserId: string): Promise<IUser> {
-    const existing = await this.userModel.findOne({ clerkUserId }).lean();
-    if (existing) return existing;
-
-    const doc: IUser = {
+    // Atomic upsert — $setOnInsert only fires on INSERT, not on find.
+    // Eliminates the race condition between findOne + replaceOne.
+    const defaults: IUser = {
       _id: `user_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`,
       clerkUserId,
       name: 'User',
@@ -29,8 +28,14 @@ export class UsersService {
       longestStreak: 0,
       updatedAt: new Date().toISOString(),
     };
-    await this.userModel.replaceOne({ _id: doc._id }, doc, { upsert: true });
-    return doc;
+    const doc = await this.userModel
+      .findOneAndUpdate(
+        { clerkUserId },
+        { $setOnInsert: defaults },
+        { upsert: true, new: true },
+      )
+      .lean();
+    return doc!;
   }
 
   async updateStreaks(clerkUserId: string, currentStreak: number, longestStreak: number): Promise<void> {

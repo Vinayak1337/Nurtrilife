@@ -223,7 +223,7 @@ export function WaterTracker({
 										borderColor: Palette.protein
 									}
 								]}>
-								<AppText variant='caption' color='#fff'>
+								<AppText variant='caption' color={Palette.white}>
 									Add
 								</AppText>
 							</Pressable>

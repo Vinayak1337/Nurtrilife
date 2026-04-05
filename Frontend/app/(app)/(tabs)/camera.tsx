@@ -124,12 +124,12 @@ export default function CameraScreen() {
 				style={[
 					styles.container,
 					styles.centered,
-					{ backgroundColor: '#0A0F1E' }
+					{ backgroundColor: Palette.dark900 }
 				]}>
 				<AppText style={styles.permissionEmoji}>📷</AppText>
 				<AppText
 					variant='heading'
-					color='#FFF'
+					color={Palette.white}
 					align='center'
 					style={{ marginBottom: Spacing.sm }}>
 					Camera Access Required
@@ -178,7 +178,7 @@ export default function CameraScreen() {
 				{/* Top bar */}
 				<SafeAreaView>
 					<Pressable onPress={handleRetake} style={styles.backButton}>
-						<IconSymbol name='xmark' size={22} color='#FFF' />
+						<IconSymbol name='xmark' size={22} color={Palette.white} />
 					</Pressable>
 				</SafeAreaView>
 
@@ -188,7 +188,7 @@ export default function CameraScreen() {
 					style={styles.previewActions}>
 					<AppText
 						variant='heading'
-						color='#FFF'
+						color={Palette.white}
 						align='center'
 						style={{ marginBottom: Spacing.base }}>
 						Looks good!
@@ -234,7 +234,7 @@ export default function CameraScreen() {
 			<SafeAreaView>
 				<View style={styles.topControls}>
 					<Pressable onPress={() => router.back()} style={styles.controlButton}>
-						<IconSymbol name='xmark' size={22} color='#FFF' />
+						<IconSymbol name='xmark' size={22} color={Palette.white} />
 					</Pressable>
 
 					<Pressable
@@ -246,7 +246,7 @@ export default function CameraScreen() {
 						<IconSymbol
 							name={flash === 'on' ? 'bolt.fill' : 'bolt.slash.fill'}
 							size={22}
-							color='#FFF'
+							color={Palette.white}
 						/>
 					</Pressable>
 				</View>
@@ -263,7 +263,7 @@ export default function CameraScreen() {
 			{/* Bottom controls */}
 			<View style={styles.bottomControls}>
 				<Pressable onPress={handleGallery} style={styles.controlButton}>
-					<IconSymbol name='photo' size={26} color='#FFF' />
+					<IconSymbol name='photo' size={26} color={Palette.white} />
 				</Pressable>
 
 				<Animated.View style={captureAnim}>
@@ -278,7 +278,7 @@ export default function CameraScreen() {
 					<IconSymbol
 						name='arrow.triangle.2.circlepath.camera'
 						size={26}
-						color='#FFF'
+						color={Palette.white}
 					/>
 				</Pressable>
 			</View>
@@ -384,7 +384,7 @@ const styles = StyleSheet.create({
 		bottom: 0,
 		left: 0,
 		right: 0,
-		paddingBottom: 20,
+		paddingBottom: 44, // push capture btn above the tab-bar FAB (was 20, FAB overlapped)
 		paddingHorizontal: Spacing.xxl,
 		flexDirection: 'row',
 		alignItems: 'center',
@@ -395,7 +395,7 @@ const styles = StyleSheet.create({
 		height: 80,
 		borderRadius: 40,
 		borderWidth: 4,
-		borderColor: '#FFF',
+		borderColor: Palette.white,
 		alignItems: 'center',
 		justifyContent: 'center',
 		backgroundColor: 'rgba(255,255,255,0.15)'
@@ -404,7 +404,7 @@ const styles = StyleSheet.create({
 		width: 60,
 		height: 60,
 		borderRadius: 30,
-		backgroundColor: '#FFF'
+		backgroundColor: Palette.white
 	},
 	previewOverlay: {
 		...StyleSheet.absoluteFill,

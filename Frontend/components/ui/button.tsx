@@ -13,7 +13,7 @@ import Animated, {
 	withSpring
 } from 'react-native-reanimated';
 import { AppText } from './text';
-import { Colors, Radius, Spacing, FontFamily, Shadow } from '@/constants/theme';
+import { Colors, Radius, Spacing, FontFamily, FontSize, Shadow } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
 type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'outline';
@@ -69,7 +69,7 @@ export function Button({
 		}
 	};
 
-	const textSizes = { sm: 13, md: 15, lg: 17 };
+	const textSizes = { sm: FontSize.sm, md: FontSize.base, lg: FontSize.md };
 
 	const variantStyles: Record<
 		ButtonVariant,

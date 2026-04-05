@@ -2,7 +2,7 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 
 import { AppText } from './text';
-import { Colors, Palette, Radius, Spacing } from '@/constants/theme';
+import { Colors, Palette, Radius, Spacing, Shadow } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import type { MealSuggestion } from '@/services/recommendations.service';
 
@@ -60,11 +60,7 @@ const styles = StyleSheet.create({
 		padding: Spacing.md,
 		borderRadius: Radius.lg,
 		marginRight: Spacing.sm,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 1 },
-		shadowOpacity: 0.06,
-		shadowRadius: 4,
-		elevation: 2
+		...Shadow.sm
 	},
 	emoji: {
 		fontSize: 32,

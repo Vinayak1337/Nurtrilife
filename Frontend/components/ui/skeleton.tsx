@@ -6,7 +6,7 @@ import Animated, {
 	withRepeat,
 	withTiming
 } from 'react-native-reanimated';
-import { Radius } from '@/constants/theme';
+import { Radius, Palette } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
 interface SkeletonProps {
@@ -40,7 +40,7 @@ export function Skeleton({
 					width,
 					height,
 					borderRadius,
-					backgroundColor: colorScheme === 'dark' ? '#1F2937' : '#E5E7EB'
+					backgroundColor: colorScheme === 'dark' ? Palette.dark700 : Palette.gray200
 				},
 				animatedStyle,
 				style

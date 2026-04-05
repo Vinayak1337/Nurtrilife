@@ -4,8 +4,8 @@ import { router } from 'expo-router';
 import dayjs from 'dayjs';
 
 import { logoutRequest, logout, completeOnboarding, updateGoals, updateProfile, syncTodayRequest, User } from '../slices/auth.slice';
-import { setMeals } from '../slices/meals.slice';
-import { setEntries } from '../slices/water.slice';
+import { replaceMealsForDate } from '../slices/meals.slice';
+import { replaceEntriesForDate } from '../slices/water.slice';
 import { refreshGamificationRequest } from '../slices/gamification.slice';
 import { cancelAllReminders } from '@/services/notifications.service';
 import { syncUserToServer, fetchMealsFromServer, fetchWaterFromServer } from '@/services/sync.service';
@@ -34,11 +34,14 @@ function* syncTodaySaga(): Generator {
     const [serverMeals, serverWater] = (yield call(
       () => Promise.all([fetchMealsFromServer(today), fetchWaterFromServer(today)]),
     )) as [Meal[], WaterEntry[]];
-    if (serverMeals.length > 0) yield put(setMeals(serverMeals));
-    if (serverWater.length > 0) yield put(setEntries(serverWater));
+    // Always replace today's data — reflects cross-device deletions.
+    // fetchMeals/fetchWater now throw on HTTP errors so the catch below
+    // protects local state if the server is unreachable.
+    yield put(replaceMealsForDate({ date: today, meals: serverMeals }));
+    yield put(replaceEntriesForDate({ date: today, entries: serverWater }));
     yield put(refreshGamificationRequest());
   } catch {
-    // non-fatal — local state is still valid
+    // Non-fatal — network error; local state remains unchanged.
   }
 }
 

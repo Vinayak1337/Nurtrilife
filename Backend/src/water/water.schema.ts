@@ -6,6 +6,7 @@ export interface IWaterEntry {
   amount: number;
   date: string;
   createdAt: string;
+  updatedAt: string;
 }
 
 export const WaterEntrySchema = new Schema(
@@ -15,6 +16,7 @@ export const WaterEntrySchema = new Schema(
     amount: { type: Number, required: true },
     date: { type: String, required: true, index: true },
     createdAt: { type: String, default: () => new Date().toISOString() },
+    updatedAt: { type: String, default: () => new Date().toISOString() },
   },
   { _id: false, versionKey: false },
 );

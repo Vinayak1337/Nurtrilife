@@ -162,6 +162,7 @@ export default function VerifyScreen() {
 		const fullCode = code.join('');
 		if (fullCode.length !== CODE_LENGTH) return;
 		if (!clerkLoaded) return;
+		setLoading(true);
 
 		try {
 			if (flow === 'sign-up' && signUp) {
