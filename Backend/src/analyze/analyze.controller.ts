@@ -1,5 +1,18 @@
-import { Controller, Post, Body, BadRequestException, HttpException, HttpStatus, InternalServerErrorException } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import {
+  Controller,
+  Post,
+  Body,
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  InternalServerErrorException,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+} from '@nestjs/swagger';
 import { GoogleGenAI } from '@google/genai';
 import { AnalyzeFoodDto } from './dto/analyze-food.dto';
 import { CurrentUser } from '../auth/current-user.decorator';
@@ -39,7 +52,10 @@ export class AnalyzeController {
   @ApiOperation({ summary: 'Analyze a food image using Gemini AI' })
   @ApiResponse({ status: 200, description: 'Nutritional analysis result' })
   @ApiResponse({ status: 400, description: 'Missing imageBase64' })
-  async analyzeFood(@CurrentUser() _userId: string, @Body() body: AnalyzeFoodDto) {
+  async analyzeFood(
+    @CurrentUser() _userId: string,
+    @Body() body: AnalyzeFoodDto,
+  ) {
     const { imageBase64 } = body;
     if (!imageBase64) throw new BadRequestException('Missing imageBase64');
 
@@ -47,31 +63,49 @@ export class AnalyzeController {
       const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
 
       const response = await ai.models.generateContent({
-        model: 'gemini-3-flash-preview',
+        model: 'gemini-3.1-flash-lite-preview',
         contents: [
           {
             role: 'user',
             parts: [
-              { text: ANALYSIS_PROMPT },
               { inlineData: { data: imageBase64, mimeType: 'image/jpeg' } },
+              { text: ANALYSIS_PROMPT },
             ],
           },
         ],
       });
 
-      const text = (response.text ?? '').trim()
+      const text = (response.text ?? '')
+        .trim()
         .replace(/^```(?:json)?\s*/i, '')
         .replace(/\s*```\s*$/i, '')
         .trim();
 
-      const raw = JSON.parse(text);
+      const raw = JSON.parse(text) as {
+        foodName?: unknown;
+        description?: unknown;
+        servingSize?: unknown;
+        calories?: unknown;
+        protein?: unknown;
+        carbs?: unknown;
+        fats?: unknown;
+        fiber?: unknown;
+        sugar?: unknown;
+        sodium?: unknown;
+        ingredients?: unknown;
+        mealType?: unknown;
+        confidence?: unknown;
+      };
 
       return {
         success: true,
         data: {
-          foodName: String(raw.foodName || 'Unknown Food'),
-          description: String(raw.description || ''),
-          servingSize: String(raw.servingSize || '1 serving'),
+          foodName:
+            typeof raw.foodName === 'string' ? raw.foodName : 'Unknown Food',
+          description:
+            typeof raw.description === 'string' ? raw.description : '',
+          servingSize:
+            typeof raw.servingSize === 'string' ? raw.servingSize : '1 serving',
           calories: Math.round(Number(raw.calories) || 0),
           protein: Number((Number(raw.protein) || 0).toFixed(1)),
           carbs: Number((Number(raw.carbs) || 0).toFixed(1)),
@@ -80,33 +114,38 @@ export class AnalyzeController {
           sugar: Number((Number(raw.sugar) || 0).toFixed(1)),
           sodium: Math.round(Number(raw.sodium) || 0),
           ingredients: Array.isArray(raw.ingredients) ? raw.ingredients : [],
-          mealType: ['breakfast', 'lunch', 'dinner', 'snack'].includes(raw.mealType)
-            ? raw.mealType
-            : 'snack',
-          confidence: ['high', 'medium', 'low'].includes(raw.confidence)
-            ? raw.confidence
-            : 'medium',
+          mealType:
+            typeof raw.mealType === 'string' &&
+            ['breakfast', 'lunch', 'dinner', 'snack'].includes(raw.mealType)
+              ? raw.mealType
+              : 'snack',
+          confidence:
+            typeof raw.confidence === 'string' &&
+            ['high', 'medium', 'low'].includes(raw.confidence)
+              ? raw.confidence
+              : 'medium',
         },
       };
-    } catch (error: any) {
-      // Gemini quota exhausted or rate-limited — surface as 429 so the client
-      // can show a user-friendly message instead of a generic 500.
+    } catch (error: unknown) {
+      const err = error as { status?: string; message?: string; code?: number };
       const isQuotaError =
-        error?.status === 'RESOURCE_EXHAUSTED' ||
-        error?.message?.includes('RESOURCE_EXHAUSTED') ||
-        error?.message?.includes('quota') ||
-        error?.code === 429;
+        err?.status === 'RESOURCE_EXHAUSTED' ||
+        err?.message?.includes('RESOURCE_EXHAUSTED') ||
+        err?.message?.includes('quota') ||
+        err?.code === 429;
 
       if (isQuotaError) {
-        console.warn('[AnalyzeController] Gemini quota exceeded:', error.message);
+        console.warn('[AnalyzeController] Gemini quota exceeded:', err.message);
         throw new HttpException(
           'AI analysis is temporarily unavailable — free-tier quota exhausted. Please try again later.',
           HttpStatus.TOO_MANY_REQUESTS,
         );
       }
 
-      console.error('[AnalyzeController]', error.message);
-      throw new InternalServerErrorException('Failed to analyze food image. Please try again.');
+      console.error('[AnalyzeController]', JSON.stringify(error));
+      throw new InternalServerErrorException(
+        'Failed to analyze food image. Please try again.',
+      );
     }
   }
 }
